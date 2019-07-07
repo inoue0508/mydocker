@@ -74,7 +74,9 @@ func showPortsList(list []ContainerComponents) error {
 
 	nameports := getNameAndPort(list)
 	for _, nameport := range nameports {
-		table.Append([]string{nameport.Name, strconv.Itoa(nameport.Port)})
+		if nameport.Port != 0 {
+			table.Append([]string{nameport.Name, strconv.Itoa(nameport.Port)})
+		}
 	}
 
 	table.Render()
@@ -102,7 +104,7 @@ func getNameAndPort(list []ContainerComponents) []NameAndPort {
 	var nameport []NameAndPort
 	for _, l := range list {
 		for _, port := range l.Ports {
-			nameport = append(nameport, NameAndPort{Name: l.ContaierName[0], Port: int(port.PublicPort)})
+			nameport = append(nameport, NameAndPort{Name: l.ContaierName[0][1:], Port: int(port.PublicPort)})
 		}
 	}
 
