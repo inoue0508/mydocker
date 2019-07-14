@@ -3,32 +3,27 @@ package log
 import (
 	"context"
 	"fmt"
+	"os/exec"
 
 	"github.com/docker/docker/client"
 
 	"github.com/spf13/cobra"
 )
 
-func NewGetLogfilePathCommand(dockerCli client.APIClient) *cobra.Command {
+func NewLsCommand(dockerCli client.APIClient) *cobra.Command {
 
 	cmd := &cobra.Command{
-		Use:   "logfile [CONTAINERNAME|CONTAINERID] ",
-		Short: "get container log file path",
+		Use:   "ls [CONTAINERNAME|CONTAINERID]",
+		Short: "Display logfile size",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runGetLogfilePath(dockerCli, args)
+			return runShowLogfileSize(dockerCli, args)
 		},
 	}
-
-	cmd.AddCommand(
-		NewLsCommand(dockerCli),
-		NewEmptyCommand(dockerCli),
-	)
-
 	return cmd
 }
 
-func runGetLogfilePath(dockerCli client.APIClient, args []string) error {
+func runShowLogfileSize(dockerCli client.APIClient, args []string) error {
 
 	ctx := context.Background()
 	containerInfo, err := dockerCli.ContainerInspect(ctx, args[0])
@@ -39,7 +34,9 @@ func runGetLogfilePath(dockerCli client.APIClient, args []string) error {
 		return fmt.Errorf("%s のコンテはありません\n", args[0])
 	}
 
-	fmt.Println(containerInfo.ContainerJSONBase.LogPath)
+	result, err := exec.Command("ls", "-lah", containerInfo.ContainerJSONBase.LogPath).Output()
+
+	fmt.Println(string(result))
 
 	return nil
 }
