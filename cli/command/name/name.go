@@ -1,6 +1,7 @@
-package removeall
+package name
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 
@@ -11,21 +12,21 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func NewRemoveAllCommand(dockerCli client.APIClient) *cobra.Command {
+func NewGetNameCommand(dockerCli client.APIClient) *cobra.Command {
 
 	cmd := &cobra.Command{
-		Use:   "rma [OPTIONS] CONTAINER [CONTAINER...]",
-		Short: "Remove containers and images",
-		Args:  cobra.MinimumNArgs(1),
+		Use:   "names",
+		Short: "get all container names",
+		Args:  cobra.ExactArgs(0),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runRM(dockerCli, args)
+			return runGetName(dockerCli, args)
 		},
 	}
 
 	return cmd
 }
 
-func runRM(dockerCli client.APIClient, opts []string) error {
+func runGetName(dockerCli client.APIClient, opts []string) error {
 
 	ctx := context.Background()
 
@@ -39,7 +40,13 @@ func runRM(dockerCli client.APIClient, opts []string) error {
 		return fmt.Errorf("Container name cannot be found%s\n", "")
 	}
 
-	fmt.Println(len(containers))
+	var bstr bytes.Buffer
+	for _, container := range containers {
+		bstr.Write([]byte(container.Names[0][1:]))
+		bstr.Write([]byte{' '})
+	}
+
+	fmt.Println(bstr.String())
 
 	return nil
 

@@ -12,9 +12,7 @@
             "program": "/home/inoue/go/src/cli/cmd/docker",
             "env": {},
             "args": [
-                "logfile",
-                "empty",
-                "grafana"
+                "names"
             ]
         }
     ]
